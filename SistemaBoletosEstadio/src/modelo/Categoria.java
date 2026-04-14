@@ -4,10 +4,8 @@
  */
 package modelo;
 
-/**
- *
- * @author Laura
- */
-public class Categoria {
-    
+public enum Categoria {
+	VIP,
+	GENERAL,
+	PREFERENCIAL
 }

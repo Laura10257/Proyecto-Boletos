@@ -1,0 +1,12 @@
+--------------------------------------------------
+Fecha y hora: 13/04/2026 19:46:26
+Categoria: VIP
+Boletos vendidos: 2
+Ingreso total: $3000.00
+Asientos: A1, A2
+--------------------------------------------------
+Fecha y hora: 13/04/2026 19:52:26
+Categoria: VIP
+Boletos vendidos: 2
+Ingreso total: $3000.00
+Asientos: A1, A2

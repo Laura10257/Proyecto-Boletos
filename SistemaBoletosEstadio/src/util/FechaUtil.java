@@ -4,10 +4,23 @@
  */
 package util;
 
-/**
- *
- * @author Laura
- */
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class FechaUtil {
-    
+
+	private static final DateTimeFormatter FORMATO_ARCHIVO = DateTimeFormatter.ofPattern("ddMMyyyy");
+	private static final DateTimeFormatter FORMATO_REPORTE = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+	private FechaUtil() {
+	}
+
+	public static String nombreArchivoDelDia() {
+		return "reporte_ventas_" + LocalDate.now().format(FORMATO_ARCHIVO) + ".txt";
+	}
+
+	public static String formatearFechaHora(LocalDateTime fechaHora) {
+		return fechaHora.format(FORMATO_REPORTE);
+	}
 }
