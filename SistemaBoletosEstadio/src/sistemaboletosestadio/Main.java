@@ -38,11 +38,11 @@ public class Main {
 
         ReporteVenta reporte = ventaServicio.confirmarCompra(Categoria.VIP, seleccion, "reportes");
         System.out.println("Compra confirmada. Reporte generado:");
-        System.out.println("Fecha: " + reporte.getFechaHora());
+        System.out.println("Fecha y hora: " + reporte.getFechaHora());
         System.out.println("Categoria: " + reporte.getCategoria());
-        System.out.println("Cantidad: " + reporte.getCantidadBoletos());
+        System.out.println("Cantidad: " + reporte.getBoletosVendidos());
         System.out.println("Ingreso: $" + String.format("%.2f", reporte.getIngresoTotal()));
-        System.out.println("Asientos: " + reporte.getAsientosVendidos());
+        System.out.println("Detalles: " + reporte.getDetalles());
 
         mostrarDisponibles(ventaServicio, Categoria.VIP);
         System.out.println("Reportes en cola: " + ventaServicio.getColaReportes().tamano());

@@ -5,37 +5,37 @@
 package modelo;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
 
 public class ReporteVenta {
 
+	private static final DateTimeFormatter FORMATO_FECHA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
 	private final LocalDateTime fechaHora;
 	private final Categoria categoria;
-	private final int cantidadBoletos;
+	private final int boletosVendidos;
 	private final double ingresoTotal;
-	private final List<String> asientosVendidos;
+	private final String detalles;
 
-	public ReporteVenta(LocalDateTime fechaHora, Categoria categoria, int cantidadBoletos, double ingresoTotal, List<String> asientosVendidos) {
+	public ReporteVenta(LocalDateTime fechaHora, Categoria categoria, int boletosVendidos, double ingresoTotal, String detalles) {
 		if (fechaHora == null || categoria == null) {
 			throw new IllegalArgumentException("La fecha y categoria son obligatorias.");
 		}
-		if (cantidadBoletos <= 0) {
+		if (boletosVendidos <= 0) {
 			throw new IllegalArgumentException("La cantidad de boletos debe ser mayor a 0.");
 		}
 		if (ingresoTotal <= 0) {
 			throw new IllegalArgumentException("El ingreso total debe ser mayor a 0.");
 		}
-		if (asientosVendidos == null || asientosVendidos.isEmpty()) {
-			throw new IllegalArgumentException("Debe incluir asientos vendidos.");
+		if (detalles == null || detalles.isBlank()) {
+			throw new IllegalArgumentException("Los detalles del reporte son obligatorios.");
 		}
 
 		this.fechaHora = fechaHora;
 		this.categoria = categoria;
-		this.cantidadBoletos = cantidadBoletos;
+		this.boletosVendidos = boletosVendidos;
 		this.ingresoTotal = ingresoTotal;
-		this.asientosVendidos = new ArrayList<>(asientosVendidos);
+		this.detalles = detalles.trim();
 	}
 
 	public LocalDateTime getFechaHora() {
@@ -46,15 +46,28 @@ public class ReporteVenta {
 		return categoria;
 	}
 
-	public int getCantidadBoletos() {
-		return cantidadBoletos;
+	public int getBoletosVendidos() {
+		return boletosVendidos;
 	}
 
 	public double getIngresoTotal() {
 		return ingresoTotal;
 	}
 
-	public List<String> getAsientosVendidos() {
-		return Collections.unmodifiableList(asientosVendidos);
+	public String getDetalles() {
+		return detalles;
+	}
+
+	public String formatearLineaResumen() {
+		return "Fecha y hora: " + fechaHora.format(FORMATO_FECHA_HORA)
+				+ System.lineSeparator() + "Categoria: " + categoria
+				+ System.lineSeparator() + "Boletos vendidos: " + boletosVendidos
+				+ System.lineSeparator() + "Ingreso total: $" + String.format("%.2f", ingresoTotal)
+				+ System.lineSeparator() + "Detalles: " + detalles;
+	}
+
+	@Override
+	public String toString() {
+		return "ReporteVenta{" + "fechaHora=" + fechaHora + ", categoria=" + categoria + ", boletosVendidos=" + boletosVendidos + ", ingresoTotal=" + ingresoTotal + ", detalles='" + detalles + '\'' + '}';
 	}
 }

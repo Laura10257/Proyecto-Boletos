@@ -6,6 +6,7 @@ package servicio;
 
 import Estructura.ColaReportes;
 import Estructura.GestorBoletos;
+import Estructura.GestorReportes;
 import Estructura.GestorPrecios;
 import Estructura.MapaAsientos;
 import java.time.LocalDateTime;
@@ -14,20 +15,19 @@ import java.util.List;
 import modelo.Boleto;
 import modelo.Categoria;
 import modelo.ReporteVenta;
-import util.ArchivoUtil;
 
 public class VentaServicio {
 
 	private final MapaAsientos mapaAsientos;
 	private final GestorPrecios gestorPrecios;
 	private final GestorBoletos gestorBoletos;
-	private final ColaReportes colaReportes;
+	private final GestorReportes gestorReportes;
 
 	public VentaServicio() {
 		this.mapaAsientos = new MapaAsientos(3, 5, 6, 8, 4, 6);
 		this.gestorPrecios = new GestorPrecios();
 		this.gestorBoletos = new GestorBoletos();
-		this.colaReportes = new ColaReportes();
+		this.gestorReportes = new GestorReportes();
 
 		inicializarBoletosCategoria(Categoria.VIP);
 		inicializarBoletosCategoria(Categoria.GENERAL);
@@ -86,11 +86,10 @@ public class VentaServicio {
 				categoria,
 				asientosVendidos.size(),
 				total,
-				asientosVendidos
+				"Asientos vendidos: " + String.join(", ", asientosVendidos)
 		);
 
-		colaReportes.encolar(reporte);
-		ArchivoUtil.guardarReporteDiario(reporte, carpetaReportes);
+		gestorReportes.registrarReporte(reporte, carpetaReportes);
 		return reporte;
 	}
 
@@ -99,6 +98,6 @@ public class VentaServicio {
 	}
 
 	public ColaReportes getColaReportes() {
-		return colaReportes;
+		return gestorReportes.getColaReportes();
 	}
 }
