@@ -99,14 +99,14 @@ public class VentanaPrincipal extends JFrame {
 
 			JOptionPane.showMessageDialog(
 					this,
-					"Compra exitosa.\nAsientos: " + String.join(", ", reporte.getAsientosVendidos())
+					"Compra exitosa.\nDetalles: " + reporte.getDetalles()
 					+ "\nTotal: $" + String.format("%.2f", reporte.getIngresoTotal()),
 					"Compra Confirmada",
 					JOptionPane.INFORMATION_MESSAGE
 			);
 
 			cargarCategoriaSeleccionada();
-		} catch (Exception ex) {
+		} catch (IllegalArgumentException | IllegalStateException | java.io.UncheckedIOException ex) {
 			JOptionPane.showMessageDialog(
 					this,
 					ex.getMessage(),

@@ -4,8 +4,10 @@
  */
 package modelo;
 
+
 public enum Categoria {
 	VIP,
 	GENERAL,
 	PREFERENCIAL
+
 }
