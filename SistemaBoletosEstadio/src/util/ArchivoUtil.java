@@ -4,10 +4,15 @@
  */
 package util;
 
-/**
- *
- * @author Laura
- */
+import Estructura.GestorReportes;
+import modelo.ReporteVenta;
+
 public class ArchivoUtil {
-    
+
+	private ArchivoUtil() {
+	}
+
+	public static void guardarReporteDiario(ReporteVenta reporte, String carpeta) {
+		GestorReportes.guardarReporteEnArchivo(reporte, carpeta);
+	}
 }
