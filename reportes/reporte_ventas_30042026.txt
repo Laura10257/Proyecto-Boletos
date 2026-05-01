@@ -1,0 +1,28 @@
+--------------------------------------------------
+Fecha y hora: 30/04/2026 22:59:27
+Categoria: PREFERENCIAL
+Boletos vendidos: 1
+Ingreso total: $1100.00
+Detalles: Asientos vendidos: C3
+
+--------------------------------------------------
+Fecha y hora: 30/04/2026 23:01:14
+Categoria: VIP
+Boletos vendidos: 1
+Ingreso total: $1500.00
+Detalles: Asientos vendidos: A2
+
+--------------------------------------------------
+Fecha y hora: 30/04/2026 23:01:24
+Categoria: VIP
+Boletos vendidos: 1
+Ingreso total: $1500.00
+Detalles: Asientos vendidos: C3
+
+--------------------------------------------------
+Fecha y hora: 30/04/2026 23:01:33
+Categoria: GENERAL
+Boletos vendidos: 1
+Ingreso total: $800.00
+Detalles: Asientos vendidos: C5
+
