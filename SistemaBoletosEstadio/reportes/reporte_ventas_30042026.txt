@@ -1,0 +1,14 @@
+--------------------------------------------------
+Fecha y hora: 30/04/2026 08:35:38
+Categoria: PREFERENCIAL
+Boletos vendidos: 2
+Ingreso total: $2200.00
+Detalles: Asientos vendidos: A4, A5
+
+--------------------------------------------------
+Fecha y hora: 30/04/2026 08:35:59
+Categoria: PREFERENCIAL
+Boletos vendidos: 1
+Ingreso total: $1100.00
+Detalles: Asientos vendidos: A6
+
