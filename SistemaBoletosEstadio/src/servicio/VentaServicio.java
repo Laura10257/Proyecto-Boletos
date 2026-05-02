@@ -2,6 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package servicio;
 
 import Estructura.ColaReportes;
@@ -16,89 +20,116 @@ import modelo.Boleto;
 import modelo.Categoria;
 import modelo.ReporteVenta;
 
+/**
+ * Clase de Servicio que orquesta la lógica de negocio del sistema.
+ * Conecta las estructuras de datos (Matrices, HashMaps, Listas y Colas) con la interfaz.
+ */
 public class VentaServicio {
 
-    private final ControladorEstadio mapaAsientos;
-    private final GestorPrecios gestorPrecios;
-    private final GestorBoletos gestorBoletos;
-    private final GestorReportes gestorReportes;
+	private final ControladorEstadio mapaAsientos;
+	private final GestorPrecios gestorPrecios;
+	private final GestorBoletos gestorBoletos;
+	private final GestorReportes gestorReportes;
 
-    public VentaServicio() {
-        this.mapaAsientos = new ControladorEstadio(3, 5, 6, 8, 4, 6);
-        this.gestorPrecios = new GestorPrecios();
-        this.gestorBoletos = new GestorBoletos();
-        this.gestorReportes = new GestorReportes();
+	public VentaServicio() {
+		// Inicialización de dimensiones del estadio (Filas, Columnas por categoría)[cite: 3]
+		this.mapaAsientos = new ControladorEstadio(3, 5, 6, 8, 4, 6);
+		this.gestorPrecios = new GestorPrecios();
+		this.gestorBoletos = new GestorBoletos();
+		this.gestorReportes = new GestorReportes();
 
-        inicializarBoletosCategoria(Categoria.VIP);
-        inicializarBoletosCategoria(Categoria.GENERAL);
-        inicializarBoletosCategoria(Categoria.PREFERENCIAL);
-    }
+		// Inicializar las listas enlazadas con los boletos base[cite: 4]
+		inicializarBoletosCategoria(Categoria.VIP);
+		inicializarBoletosCategoria(Categoria.GENERAL);
+		inicializarBoletosCategoria(Categoria.PREFERENCIAL);
+	}
 
-    private void inicializarBoletosCategoria(Categoria categoria) {
-        List<String> asientosDisponibles = mapaAsientos.listarAsientosDisponibles(categoria);
-        double precio = gestorPrecios.obtenerPrecio(categoria);
-        gestorBoletos.inicializarBoletos(categoria, asientosDisponibles, precio);
-    }
+	/**
+	 * Crea los objetos Boleto y los almacena en la LinkedList correspondiente.
+	 */
+	private void inicializarBoletosCategoria(Categoria categoria) {
+		List<String> asientosDisponibles = mapaAsientos.listarAsientosDisponibles(categoria);
+		double precio = gestorPrecios.obtenerPrecio(categoria);
+		gestorBoletos.inicializarBoletos(categoria, asientosDisponibles, precio);
+	}
 
-    public List<String> obtenerAsientosDisponibles(Categoria categoria) {
-        Validador.validarCategoria(categoria);
-        return mapaAsientos.listarAsientosDisponibles(categoria);
-    }
+	public List<String> obtenerAsientosDisponibles(Categoria categoria) {
+		Validador.validarCategoria(categoria);
+		return mapaAsientos.listarAsientosDisponibles(categoria);
+	}
 
-    public double calcularTotal(Categoria categoria, List<String> asientos) {
-        Validador.validarCategoria(categoria);
-        Validador.validarAsientosSeleccionados(asientos);
-        Validador.validarAsientosNoDuplicados(asientos);
-        return gestorPrecios.obtenerPrecio(categoria) * asientos.size();
-    }
+	/**
+	 * Calcula el total consultando el precio actual en el HashMap.
+	 */
+	public double calcularTotal(Categoria categoria, List<String> asientos) {
+		Validador.validarCategoria(categoria);
+		Validador.validarAsientosSeleccionados(asientos);
+		Validador.validarAsientosNoDuplicados(asientos);
+		
+		double precioActual = gestorPrecios.obtenerPrecio(categoria);
+		return precioActual * asientos.size();
+	}
 
-    public ReporteVenta confirmarCompra(Categoria categoria, List<String> asientos, String carpetaReportes) {
-        Validador.validarCategoria(categoria);
-        Validador.validarAsientosSeleccionados(asientos);
-        Validador.validarAsientosNoDuplicados(asientos);
+	/**
+	 * Proceso de compra: Ejecuta la Gestión Dinámica en Listas y el registro en Cola FIFO[cite: 1, 2, 4].
+	 */
+	public ReporteVenta confirmarCompra(Categoria categoria, List<String> asientos, String carpetaReportes) {
+		Validador.validarCategoria(categoria);
+		Validador.validarAsientosSeleccionados(asientos);
+		Validador.validarAsientosNoDuplicados(asientos);
 
-        List<String> asientosVendidos = new ArrayList<>();
-        double total = 0;
+		List<String> asientosVendidos = new ArrayList<>();
+		double precioAlMomento = gestorPrecios.obtenerPrecio(categoria);
+		double total = 0;
 
-        for (String asiento : asientos) {
-            String normalizado = asiento.trim().toUpperCase();
-            
-            // 1. Validar en el mapa visual (matriz)
-            if (!mapaAsientos.estaDisponible(categoria, normalizado)) {
-                throw new IllegalStateException("El asiento " + normalizado + " ya está ocupado.");
-            }
+		for (String asiento : asientos) {
+			String normalizado = asiento.trim().toUpperCase();
+			
+			// 1. Validar disponibilidad en la Matriz Visual[cite: 3]
+			if (!mapaAsientos.estaDisponible(categoria, normalizado)) {
+				throw new IllegalStateException("El asiento " + normalizado + " ya está ocupado.");
+			}
 
-            // 2. Ejecutar Gestión Dinámica en Listas Enlazadas (Eliminar de disponibles y mover a vendidos)
-            try {
-                gestorBoletos.registrarVentaDinamica(categoria, normalizado);
-            } catch (IllegalStateException e) {
-                throw new IllegalStateException("Inconsistencia: " + e.getMessage());
-            }
+			// 2. GESTIÓN DINÁMICA: Eliminar de LinkedList de disponibles y mover a vendidos[cite: 1, 4]
+			gestorBoletos.registrarVentaDinamica(categoria, normalizado);
+			
+			// 3. Actualizar estado en la Matriz[cite: 3]
+			mapaAsientos.ocuparAsiento(categoria, normalizado);
 
-            // 3. Ocupar en la matriz visual
-            mapaAsientos.ocuparAsiento(categoria, normalizado);
+			asientosVendidos.add(normalizado);
+			total += precioAlMomento;
+		}
 
-            asientosVendidos.add(normalizado);
-            total += gestorPrecios.obtenerPrecio(categoria);
-        }
+		// Crear el reporte de la transacción[cite: 13]
+		ReporteVenta reporte = new ReporteVenta(
+				LocalDateTime.now(),
+				categoria,
+				asientosVendidos.size(),
+				total,
+				"Asientos: " + String.join(", ", asientosVendidos)
+		);
 
-        ReporteVenta reporte = new ReporteVenta(
-                LocalDateTime.now(),
-                categoria,
-                asientosVendidos.size(),
-                total,
-                "Asientos vendidos: " + String.join(", ", asientosVendidos)
-        );
+		// 4. REGISTRO EN COLA (FIFO): Almacenar para cierre de caja o persistencia[cite: 1, 2, 6]
+		gestorReportes.registrarReporte(reporte, carpetaReportes);
+		
+		return reporte;
+	}
 
-        gestorReportes.registrarReporte(reporte, carpetaReportes);
-        return reporte;
-    }
+	/**
+	 * REQUISITO: Actualizar precio en el HashMap[cite: 1, 5].
+	 */
+	public void actualizarPrecioCategoria(Categoria categoria, double nuevoPrecio) {
+		gestorPrecios.actualizarPrecio(categoria, nuevoPrecio);
+	}
 
-    public void actualizarPrecioCategoria(Categoria categoria, double nuevoPrecio) {
-        gestorPrecios.actualizarPrecio(categoria, nuevoPrecio);
-    }
+	public double obtenerPrecioActual(Categoria categoria) {
+		return gestorPrecios.obtenerPrecio(categoria);
+	}
 
-    public ColaReportes getColaReportes() {
-        return gestorReportes.getColaReportes();
-    }
+	/**
+	 * Acceso a la cola para el Panel de Administración[cite: 2, 6].
+	 */
+	public ColaReportes getColaReportes() {
+		return gestorReportes.getColaReportes();
+	}
 }

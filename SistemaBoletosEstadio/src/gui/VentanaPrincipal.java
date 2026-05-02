@@ -29,6 +29,7 @@ public class VentanaPrincipal extends JFrame {
     private JButton btnVIP, btnGeneral, btnPreferencial;
     private JLabel  lblCatNombre;
     private JLabel  lblDisponibles;
+    private JLabel lblPriceVIP, lblPriceGen, lblPricePre;
 
     public VentanaPrincipal() {
         super("Sistema de Boletos — Estadio");
@@ -66,7 +67,6 @@ public class VentanaPrincipal extends JFrame {
         panelCompra.setPreferredSize(new Dimension(240, 0));
     }
 
-    // ── Header ───────────────────────────────────────────────────────────────
     private JPanel buildHeader() {
         JPanel header = new JPanel(new BorderLayout(20, 0)) {
             @Override
@@ -94,26 +94,32 @@ public class VentanaPrincipal extends JFrame {
         JLabel title = new JLabel("SISTEMA DE BOLETOS");
         title.setFont(new Font("Segoe UI", Font.BOLD, 17));
         title.setForeground(Color.WHITE);
-        JLabel sub = new JLabel("Estadio Municipal  —  Gestion de Entradas");
+        JLabel sub = new JLabel("Estadio Municipal  —  Gestión de Entradas");
         sub.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         sub.setForeground(MUTED);
         titles.add(title);
         titles.add(sub);
         left.add(titles);
 
-        String fecha = new java.text.SimpleDateFormat(
-            "EEEE dd 'de' MMMM yyyy", java.util.Locale.of("es", "MX"))
-            .format(new java.util.Date());
-        JLabel lblFecha = new JLabel(fecha);
-        lblFecha.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lblFecha.setForeground(MUTED);
+        JButton btnAdmin = new JButton("⚙") {
+            {
+                setContentAreaFilled(false);
+                setBorderPainted(false);
+                setForeground(MUTED);
+                setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            }
+        };
+        btnAdmin.addActionListener(e -> abrirPanelAdministracion());
 
-        header.add(left,     BorderLayout.WEST);
-        header.add(lblFecha, BorderLayout.EAST);
+        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 20));
+        right.setOpaque(false);
+        right.add(btnAdmin);
+
+        header.add(left, BorderLayout.WEST);
+        header.add(right, BorderLayout.EAST);
         return header;
     }
 
-    // ── Sidebar ──────────────────────────────────────────────────────────────
     private JPanel buildSidebar() {
         JPanel sidebar = new JPanel(new BorderLayout());
         sidebar.setBackground(BG_SURFACE);
@@ -125,11 +131,11 @@ public class VentanaPrincipal extends JFrame {
         inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
         inner.setBorder(new EmptyBorder(20, 10, 20, 10));
 
-        inner.add(microLabel("CATEGORIAS"));
+        inner.add(microLabel("CATEGORÍAS"));
         inner.add(Box.createVerticalStrut(12));
 
         btnVIP          = buildCatBtn("VIP",          "Zona Premium",    VIP_COLOR, Categoria.VIP);
-        btnGeneral      = buildCatBtn("GENERAL",      "Zona Estandar",   GEN_COLOR, Categoria.GENERAL);
+        btnGeneral      = buildCatBtn("GENERAL",      "Zona Estándar",   GEN_COLOR, Categoria.GENERAL);
         btnPreferencial = buildCatBtn("PREFERENCIAL", "Zona Preferente", PRE_COLOR, Categoria.PREFERENCIAL);
 
         inner.add(btnVIP);          inner.add(Box.createVerticalStrut(6));
@@ -139,53 +145,6 @@ public class VentanaPrincipal extends JFrame {
         inner.add(buildPriceCard());
         sidebar.add(inner, BorderLayout.NORTH);
         return sidebar;
-    }
-
-    private JButton buildCatBtn(String name, String sub, Color color, Categoria cat) {
-        JButton btn = new JButton() {
-            boolean hovered = false;
-            {
-                addMouseListener(new MouseAdapter() {
-                    @Override public void mouseEntered(MouseEvent e) { hovered = true;  repaint(); }
-                    @Override public void mouseExited(MouseEvent e)  { hovered = false; repaint(); }
-                });
-            }
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                boolean active = categoriaActual == cat;
-                if (active) {
-                    g2.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 28));
-                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-                    g2.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 90));
-                    g2.setStroke(new BasicStroke(1.2f));
-                    g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 10, 10);
-                    g2.setColor(color);
-                    g2.fillRoundRect(0, 9, 3, getHeight() - 18, 2, 2);
-                } else if (hovered) {
-                    g2.setColor(new Color(255, 255, 255, 10));
-                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
-                }
-                g2.setColor(color);
-                g2.fillOval(12, getHeight() / 2 - 5, 10, 10);
-                g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
-                g2.setColor(active ? Color.WHITE : TEXT);
-                g2.drawString(name, 29, getHeight() / 2 - 2);
-                g2.setFont(new Font("Segoe UI", Font.PLAIN, 9));
-                g2.setColor(MUTED);
-                g2.drawString(sub, 29, getHeight() / 2 + 10);
-                g2.dispose();
-            }
-        };
-        btn.setPreferredSize(new Dimension(168, 52));
-        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 52));
-        btn.setBorderPainted(false);
-        btn.setContentAreaFilled(false);
-        btn.setFocusPainted(false);
-        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btn.addActionListener(e -> seleccionarCategoria(cat));
-        return btn;
     }
 
     private JPanel buildPriceCard() {
@@ -202,31 +161,23 @@ public class VentanaPrincipal extends JFrame {
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
         p.setBorder(new EmptyBorder(10, 12, 10, 12));
         p.setAlignmentX(LEFT_ALIGNMENT);
-        p.add(microLabel("PRECIOS"));
+        p.add(microLabel("PRECIOS (HASHMAP)"));
         p.add(Box.createVerticalStrut(8));
-        p.add(priceRow("VIP",          "$1,500", VIP_COLOR));
+        
+        lblPriceVIP = new JLabel();
+        lblPricePre = new JLabel();
+        lblPriceGen = new JLabel();
+        
+        actualizarEtiquetasPrecios();
+
+        p.add(priceRow("VIP", lblPriceVIP, VIP_COLOR));
         p.add(Box.createVerticalStrut(5));
-        p.add(priceRow("PREFERENCIAL", "$1,100", PRE_COLOR));
+        p.add(priceRow("PREF", lblPricePre, PRE_COLOR));
         p.add(Box.createVerticalStrut(5));
-        p.add(priceRow("GENERAL",      "$800",   GEN_COLOR));
+        p.add(priceRow("GEN", lblPriceGen, GEN_COLOR));
         return p;
     }
 
-    private JPanel priceRow(String cat, String price, Color color) {
-        JPanel row = new JPanel(new BorderLayout());
-        row.setOpaque(false);
-        JLabel lCat = new JLabel(cat);
-        lCat.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-        lCat.setForeground(color);
-        JLabel lPrice = new JLabel(price);
-        lPrice.setFont(new Font("Segoe UI", Font.BOLD, 10));
-        lPrice.setForeground(Color.WHITE);
-        row.add(lCat,   BorderLayout.WEST);
-        row.add(lPrice, BorderLayout.EAST);
-        return row;
-    }
-
-    // ── Center ───────────────────────────────────────────────────────────────
     private JPanel buildCenter() {
         JPanel center = new JPanel(new BorderLayout(0, 10));
         center.setBackground(BG_DEEP);
@@ -252,66 +203,6 @@ public class VentanaPrincipal extends JFrame {
         return center;
     }
 
-    private JPanel buildLegend() {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.CENTER, 18, 4));
-        p.setOpaque(false);
-        p.add(legendItem("Disponible",   new Color(35, 134, 54)));
-        p.add(legendItem("Seleccionado", new Color(210, 153, 34)));
-        p.add(legendItem("Ocupado",      new Color(55, 62, 72)));
-        return p;
-    }
-
-    private JPanel legendItem(String label, Color color) {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        p.setOpaque(false);
-        JPanel dot = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g;
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(color);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 4, 4);
-            }
-        };
-        dot.setPreferredSize(new Dimension(12, 12));
-        dot.setOpaque(false);
-        JLabel lbl = new JLabel(label);
-        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        lbl.setForeground(MUTED);
-        p.add(dot);
-        p.add(lbl);
-        return p;
-    }
-
-    // ── Status bar ───────────────────────────────────────────────────────────
-    private JPanel buildStatusBar() {
-        JPanel sb = new JPanel(new BorderLayout());
-        sb.setBackground(BG_SURFACE);
-        sb.setPreferredSize(new Dimension(0, 26));
-        sb.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(1, 0, 0, 0, BORDER),
-            new EmptyBorder(0, 14, 0, 14)
-        ));
-        JLabel msg = new JLabel("Sistema listo  •  Haz clic en un asiento para seleccionarlo");
-        msg.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-        msg.setForeground(MUTED);
-        JLabel ver = new JLabel("v2.0");
-        ver.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-        ver.setForeground(new Color(65, 73, 85));
-        sb.add(msg, BorderLayout.WEST);
-        sb.add(ver, BorderLayout.EAST);
-        return sb;
-    }
-
-    private JLabel microLabel(String text) {
-        JLabel lbl = new JLabel(text);
-        lbl.setFont(new Font("Segoe UI", Font.BOLD, 9));
-        lbl.setForeground(MUTED);
-        lbl.setAlignmentX(LEFT_ALIGNMENT);
-        return lbl;
-    }
-
-    // ── Events ───────────────────────────────────────────────────────────────
     private void enlazarEventos() {
         panelAsientos.setOnSeleccionCambiada(this::actualizarResumen);
         panelCompra.getBtnConfirmar().addActionListener(e -> confirmarCompra());
@@ -321,67 +212,129 @@ public class VentanaPrincipal extends JFrame {
         });
     }
 
+    private void confirmarCompra() {
+        List<String> seleccionados = panelAsientos.getAsientosSeleccionados();
+        if (seleccionados.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Selecciona al menos un asiento.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            ReporteVenta reporte = ventaServicio.confirmarCompra(categoriaActual, seleccionados, "reportes");
+            DialogoTicket ticket = new DialogoTicket(this, reporte, seleccionados);
+            ticket.setVisible(true);
+            cargarCategoriaSeleccionada();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void abrirPanelAdministracion() {
+        String pass = JOptionPane.showInputDialog(this, "Contraseña Admin:", "Acceso", JOptionPane.QUESTION_MESSAGE);
+        if ("1234".equals(pass)) {
+            PanelAdmin admin = new PanelAdmin(this, ventaServicio);
+            admin.setVisible(true);
+            actualizarEtiquetasPrecios();
+            actualizarResumen();
+        } else if (pass != null) {
+            JOptionPane.showMessageDialog(this, "Contraseña incorrecta.", "Error de Acceso", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void actualizarEtiquetasPrecios() {
+        lblPriceVIP.setText("$" + String.format("%.0f", ventaServicio.obtenerPrecioActual(Categoria.VIP)));
+        lblPricePre.setText("$" + String.format("%.0f", ventaServicio.obtenerPrecioActual(Categoria.PREFERENCIAL)));
+        lblPriceGen.setText("$" + String.format("%.0f", ventaServicio.obtenerPrecioActual(Categoria.GENERAL)));
+    }
+
+    private JButton buildCatBtn(String name, String sub, Color color, Categoria cat) {
+        JButton btn = new JButton() {
+            boolean hovered = false;
+            {
+                addMouseListener(new MouseAdapter() {
+                    @Override public void mouseEntered(MouseEvent e) { hovered = true;  repaint(); }
+                    @Override public void mouseExited(MouseEvent e)  { hovered = false; repaint(); }
+                });
+            }
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                boolean active = categoriaActual == cat;
+                if (active) {
+                    g2.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 28));
+                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                    g2.setColor(color);
+                    g2.fillRoundRect(0, 9, 3, getHeight() - 18, 2, 2);
+                } else if (hovered) {
+                    g2.setColor(new Color(255, 255, 255, 10));
+                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                }
+                g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                g2.setColor(active ? Color.WHITE : TEXT);
+                g2.drawString(name, 29, getHeight() / 2 - 2);
+                g2.dispose();
+            }
+        };
+        btn.setPreferredSize(new Dimension(168, 52));
+        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 52));
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.addActionListener(e -> seleccionarCategoria(cat));
+        return btn;
+    }
+
     private void seleccionarCategoria(Categoria cat) {
         categoriaActual = cat;
-        btnVIP.repaint();
-        btnGeneral.repaint();
-        btnPreferencial.repaint();
         cargarCategoriaSeleccionada();
     }
 
     private void cargarCategoriaSeleccionada() {
         List<String> disponibles = ventaServicio.obtenerAsientosDisponibles(categoriaActual);
         panelAsientos.refrescar(categoriaActual, disponibles);
-
-        String nombre = switch (categoriaActual) {
-            case VIP          -> "VIP — Zona Premium";
-            case GENERAL      -> "General — Zona Estandar";
-            case PREFERENCIAL -> "Preferencial — Zona Preferente";
-        };
-        Color color = switch (categoriaActual) {
-            case VIP          -> VIP_COLOR;
-            case GENERAL      -> GEN_COLOR;
-            case PREFERENCIAL -> PRE_COLOR;
-        };
-        lblCatNombre.setText(nombre);
-        lblCatNombre.setForeground(color);
-        lblDisponibles.setText(disponibles.size() + " disponible" + (disponibles.size() != 1 ? "s" : ""));
-
+        lblCatNombre.setText(categoriaActual.toString());
         actualizarResumen();
     }
 
     private void actualizarResumen() {
         List<String> seleccionados = panelAsientos.getAsientosSeleccionados();
-        double total = 0;
-        if (!seleccionados.isEmpty()) {
-            total = ventaServicio.calcularTotal(categoriaActual, seleccionados);
-        }
+        double total = seleccionados.isEmpty() ? 0 : ventaServicio.calcularTotal(categoriaActual, seleccionados);
         panelCompra.actualizarSeleccion(seleccionados, total);
-
-        int disp = panelAsientos.getDisponiblesActuales().size();
-        lblDisponibles.setText(disp + " disponible" + (disp != 1 ? "s" : ""));
+        lblDisponibles.setText(panelAsientos.getDisponiblesActuales().size() + " disponibles");
     }
 
-    private void confirmarCompra() {
-        List<String> seleccionados = panelAsientos.getAsientosSeleccionados();
-        if (seleccionados.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                "Selecciona al menos un asiento antes de confirmar.",
-                "Sin seleccion", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        try {
-            ReporteVenta reporte = ventaServicio.confirmarCompra(categoriaActual, seleccionados, "reportes");
-            String msg = "<html><body style='font-family:Segoe UI;padding:6px'>"
-                + "<b style='font-size:13px'>Compra exitosa</b><br><br>"
-                + "Categoria: <b>" + reporte.getCategoria() + "</b><br>"
-                + "Asientos: <b>" + seleccionados + "</b><br>"
-                + "Total pagado: <b>$" + String.format("%,.2f", reporte.getIngresoTotal()) + "</b>"
-                + "</body></html>";
-            JOptionPane.showMessageDialog(this, msg, "Compra Confirmada", JOptionPane.INFORMATION_MESSAGE);
-            cargarCategoriaSeleccionada();
-        } catch (IllegalArgumentException | IllegalStateException | java.io.UncheckedIOException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error en compra", JOptionPane.ERROR_MESSAGE);
-        }
+    private JPanel priceRow(String cat, JLabel lblPrice, Color color) {
+        JPanel row = new JPanel(new BorderLayout());
+        row.setOpaque(false);
+        JLabel l = new JLabel(cat);
+        l.setForeground(color);
+        l.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        lblPrice.setForeground(Color.WHITE);
+        lblPrice.setFont(new Font("Segoe UI", Font.BOLD, 10));
+        row.add(l, BorderLayout.WEST);
+        row.add(lblPrice, BorderLayout.EAST);
+        return row;
+    }
+
+    private JLabel microLabel(String text) {
+        JLabel lbl = new JLabel(text);
+        lbl.setFont(new Font("Segoe UI", Font.BOLD, 9));
+        lbl.setForeground(MUTED);
+        return lbl;
+    }
+
+    private JPanel buildLegend() {
+        JPanel p = new JPanel(new FlowLayout());
+        p.setOpaque(false);
+        p.add(new JLabel("Leyenda: [D] Disponible [S] Seleccionado [O] Ocupado"));
+        return p;
+    }
+
+    private JPanel buildStatusBar() {
+        JPanel sb = new JPanel(new BorderLayout());
+        sb.setBackground(BG_SURFACE);
+        sb.setPreferredSize(new Dimension(0, 26));
+        sb.add(new JLabel(" v2.0 - Sistema de Gestión de Estadio"), BorderLayout.WEST);
+        return sb;
     }
 }
