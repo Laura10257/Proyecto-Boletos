@@ -11,6 +11,7 @@ import servicio.VentaServicio;
 
 public class VentanaPrincipal extends JFrame {
 
+    // Constantes de diseño originales
     private static final Color BG_DEEP    = new Color(13,  17,  23);
     private static final Color BG_SURFACE = new Color(22,  27,  34);
     private static final Color BORDER     = new Color(48,  54,  61);
@@ -29,6 +30,9 @@ public class VentanaPrincipal extends JFrame {
     private JButton btnVIP, btnGeneral, btnPreferencial;
     private JLabel  lblCatNombre;
     private JLabel  lblDisponibles;
+
+    // Componentes nuevos para la gestión de precios
+    private JLabel lblPriceVIP, lblPriceGen, lblPricePre;
 
     public VentanaPrincipal() {
         super("Sistema de Boletos — Estadio");
@@ -66,7 +70,7 @@ public class VentanaPrincipal extends JFrame {
         panelCompra.setPreferredSize(new Dimension(240, 0));
     }
 
-    // ── Header ───────────────────────────────────────────────────────────────
+    //  Header ──────────────────
     private JPanel buildHeader() {
         JPanel header = new JPanel(new BorderLayout(20, 0)) {
             @Override
@@ -94,7 +98,7 @@ public class VentanaPrincipal extends JFrame {
         JLabel title = new JLabel("SISTEMA DE BOLETOS");
         title.setFont(new Font("Segoe UI", Font.BOLD, 17));
         title.setForeground(Color.WHITE);
-        JLabel sub = new JLabel("Estadio Municipal  —  Gestion de Entradas");
+        JLabel sub = new JLabel("Estadio Municipal  —  Gestión de Entradas");
         sub.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         sub.setForeground(MUTED);
         titles.add(title);
@@ -113,7 +117,7 @@ public class VentanaPrincipal extends JFrame {
         return header;
     }
 
-    // ── Sidebar ──────────────────────────────────────────────────────────────
+    // Sidebar 
     private JPanel buildSidebar() {
         JPanel sidebar = new JPanel(new BorderLayout());
         sidebar.setBackground(BG_SURFACE);
@@ -125,20 +129,60 @@ public class VentanaPrincipal extends JFrame {
         inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
         inner.setBorder(new EmptyBorder(20, 10, 20, 10));
 
-        inner.add(microLabel("CATEGORIAS"));
+        inner.add(microLabel("CATEGORÍAS"));
         inner.add(Box.createVerticalStrut(12));
 
         btnVIP          = buildCatBtn("VIP",          "Zona Premium",    VIP_COLOR, Categoria.VIP);
-        btnGeneral      = buildCatBtn("GENERAL",      "Zona Estandar",   GEN_COLOR, Categoria.GENERAL);
+        btnGeneral      = buildCatBtn("GENERAL",      "Zona Estándar",   GEN_COLOR, Categoria.GENERAL);
         btnPreferencial = buildCatBtn("PREFERENCIAL", "Zona Preferente", PRE_COLOR, Categoria.PREFERENCIAL);
 
         inner.add(btnVIP);          inner.add(Box.createVerticalStrut(6));
         inner.add(btnGeneral);      inner.add(Box.createVerticalStrut(6));
         inner.add(btnPreferencial); inner.add(Box.createVerticalStrut(24));
 
+        // PUNTO IMPORTANTE: Panel visual para mostrar precios del HashMap
         inner.add(buildPriceCard());
+        
+        // REQUISITO: Botón de Administración para actualizar precios
+        inner.add(Box.createVerticalStrut(20));
+        JButton btnAdmin = new JButton("Actualizar Precios");
+        btnAdmin.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnAdmin.addActionListener(e -> mostrarDialogoActualizarPrecios());
+        inner.add(btnAdmin);
+
         sidebar.add(inner, BorderLayout.NORTH);
         return sidebar;
+    }
+
+    private void mostrarDialogoActualizarPrecios() {
+        JTextField fVip = new JTextField(String.valueOf(ventaServicio.obtenerPrecioActual(Categoria.VIP)));
+        JTextField fGen = new JTextField(String.valueOf(ventaServicio.obtenerPrecioActual(Categoria.GENERAL)));
+        JTextField fPre = new JTextField(String.valueOf(ventaServicio.obtenerPrecioActual(Categoria.PREFERENCIAL)));
+
+        Object[] message = {
+            "Nuevo Precio VIP:", fVip,
+            "Nuevo Precio General:", fGen,
+            "Nuevo Precio Preferencial:", fPre
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Actualizar HashMap de Precios", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            try {
+                ventaServicio.actualizarPrecioCategoria(Categoria.VIP, Double.parseDouble(fVip.getText()));
+                ventaServicio.actualizarPrecioCategoria(Categoria.GENERAL, Double.parseDouble(fGen.getText()));
+                ventaServicio.actualizarPrecioCategoria(Categoria.PREFERENCIAL, Double.parseDouble(fPre.getText()));
+                
+                // Refrescar etiquetas visuales
+                lblPriceVIP.setText("$" + fVip.getText());
+                lblPriceGen.setText("$" + fGen.getText());
+                lblPricePre.setText("$" + fPre.getText());
+                actualizarResumen();
+                
+                JOptionPane.showMessageDialog(this, "Precios actualizados correctamente.");
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Error: Ingrese valores válidos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     private JButton buildCatBtn(String name, String sub, Color color, Categoria cat) {
@@ -202,31 +246,35 @@ public class VentanaPrincipal extends JFrame {
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
         p.setBorder(new EmptyBorder(10, 12, 10, 12));
         p.setAlignmentX(LEFT_ALIGNMENT);
-        p.add(microLabel("PRECIOS"));
+        p.add(microLabel("PRECIOS ACTUALES"));
         p.add(Box.createVerticalStrut(8));
-        p.add(priceRow("VIP",          "$1,500", VIP_COLOR));
+        
+        lblPriceVIP = new JLabel("$" + String.format("%.0f", ventaServicio.obtenerPrecioActual(Categoria.VIP)));
+        lblPricePre = new JLabel("$" + String.format("%.0f", ventaServicio.obtenerPrecioActual(Categoria.PREFERENCIAL)));
+        lblPriceGen = new JLabel("$" + String.format("%.0f", ventaServicio.obtenerPrecioActual(Categoria.GENERAL)));
+
+        p.add(priceRow("VIP", lblPriceVIP, VIP_COLOR));
         p.add(Box.createVerticalStrut(5));
-        p.add(priceRow("PREFERENCIAL", "$1,100", PRE_COLOR));
+        p.add(priceRow("PREF", lblPricePre, PRE_COLOR));
         p.add(Box.createVerticalStrut(5));
-        p.add(priceRow("GENERAL",      "$800",   GEN_COLOR));
+        p.add(priceRow("GEN", lblPriceGen, GEN_COLOR));
         return p;
     }
 
-    private JPanel priceRow(String cat, String price, Color color) {
+    private JPanel priceRow(String label, JLabel priceLabel, Color color) {
         JPanel row = new JPanel(new BorderLayout());
         row.setOpaque(false);
-        JLabel lCat = new JLabel(cat);
+        JLabel lCat = new JLabel(label);
         lCat.setFont(new Font("Segoe UI", Font.PLAIN, 10));
         lCat.setForeground(color);
-        JLabel lPrice = new JLabel(price);
-        lPrice.setFont(new Font("Segoe UI", Font.BOLD, 10));
-        lPrice.setForeground(Color.WHITE);
+        priceLabel.setFont(new Font("Segoe UI", Font.BOLD, 10));
+        priceLabel.setForeground(Color.WHITE);
         row.add(lCat,   BorderLayout.WEST);
-        row.add(lPrice, BorderLayout.EAST);
+        row.add(priceLabel, BorderLayout.EAST);
         return row;
     }
 
-    // ── Center ───────────────────────────────────────────────────────────────
+    // Center Status Bar 
     private JPanel buildCenter() {
         JPanel center = new JPanel(new BorderLayout(0, 10));
         center.setBackground(BG_DEEP);
@@ -283,7 +331,6 @@ public class VentanaPrincipal extends JFrame {
         return p;
     }
 
-    // ── Status bar ───────────────────────────────────────────────────────────
     private JPanel buildStatusBar() {
         JPanel sb = new JPanel(new BorderLayout());
         sb.setBackground(BG_SURFACE);
@@ -367,14 +414,14 @@ public class VentanaPrincipal extends JFrame {
         if (seleccionados.isEmpty()) {
             JOptionPane.showMessageDialog(this,
                 "Selecciona al menos un asiento antes de confirmar.",
-                "Sin seleccion", JOptionPane.WARNING_MESSAGE);
+                "Sin selección", JOptionPane.WARNING_MESSAGE);
             return;
         }
         try {
             ReporteVenta reporte = ventaServicio.confirmarCompra(categoriaActual, seleccionados, "reportes");
             String msg = "<html><body style='font-family:Segoe UI;padding:6px'>"
                 + "<b style='font-size:13px'>Compra exitosa</b><br><br>"
-                + "Categoria: <b>" + reporte.getCategoria() + "</b><br>"
+                + "Categoría: <b>" + reporte.getCategoria() + "</b><br>"
                 + "Asientos: <b>" + seleccionados + "</b><br>"
                 + "Total pagado: <b>$" + String.format("%,.2f", reporte.getIngresoTotal()) + "</b>"
                 + "</body></html>";
