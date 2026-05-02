@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Estructura;
 
 import java.util.ArrayList;
@@ -10,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 import modelo.Categoria;
 
-public class MapaAsientos {
+public class ControladorEstadio {
 
 	private final Map<Categoria, boolean[][]> mapa = new EnumMap<>(Categoria.class);
 
-	public MapaAsientos(int filasVip, int columnasVip, int filasGeneral, int columnasGeneral, int filasPreferencial, int columnasPreferencial) {
+	public ControladorEstadio(int filasVip, int columnasVip, int filasGeneral, int columnasGeneral, int filasPreferencial, int columnasPreferencial) {
 		mapa.put(Categoria.VIP, new boolean[filasVip][columnasVip]);
 		mapa.put(Categoria.GENERAL, new boolean[filasGeneral][columnasGeneral]);
 		mapa.put(Categoria.PREFERENCIAL, new boolean[filasPreferencial][columnasPreferencial]);

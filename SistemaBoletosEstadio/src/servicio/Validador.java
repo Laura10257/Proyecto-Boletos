@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package servicio;
 
 import java.util.HashSet;
@@ -9,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 import modelo.Categoria;
 
-public class Validaciones {
+public class Validador {
 
 	public static void validarCategoria(Categoria categoria) {
 		if (categoria == null) {

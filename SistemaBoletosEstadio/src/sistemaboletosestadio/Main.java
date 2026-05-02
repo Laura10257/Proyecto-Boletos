@@ -4,7 +4,7 @@
  */
 package sistemaboletosestadio;
 
-import gui.VentanaPrincipal;
+import gui.PantallaInicio;
 import java.util.Arrays;
 import java.util.List;
 import javax.swing.SwingUtilities;
@@ -21,8 +21,8 @@ public class Main {
         }
 
         SwingUtilities.invokeLater(() -> {
-            VentanaPrincipal ventana = new VentanaPrincipal();
-            ventana.setVisible(true);
+            PantallaInicio inicio = new PantallaInicio();
+            inicio.setVisible(true);
         });
     }
 

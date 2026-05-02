@@ -8,7 +8,7 @@ import Estructura.ColaReportes;
 import Estructura.GestorBoletos;
 import Estructura.GestorReportes;
 import Estructura.GestorPrecios;
-import Estructura.MapaAsientos;
+import Estructura.ControladorEstadio;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +18,13 @@ import modelo.ReporteVenta;
 
 public class VentaServicio {
 
-	private final MapaAsientos mapaAsientos;
+	private final ControladorEstadio mapaAsientos;
 	private final GestorPrecios gestorPrecios;
 	private final GestorBoletos gestorBoletos;
 	private final GestorReportes gestorReportes;
 
 	public VentaServicio() {
-		this.mapaAsientos = new MapaAsientos(3, 5, 6, 8, 4, 6);
+		this.mapaAsientos = new ControladorEstadio(3, 5, 6, 8, 4, 6);
 		this.gestorPrecios = new GestorPrecios();
 		this.gestorBoletos = new GestorBoletos();
 		this.gestorReportes = new GestorReportes();
@@ -41,21 +41,21 @@ public class VentaServicio {
 	}
 
 	public List<String> obtenerAsientosDisponibles(Categoria categoria) {
-		Validaciones.validarCategoria(categoria);
+		Validador.validarCategoria(categoria);
 		return mapaAsientos.listarAsientosDisponibles(categoria);
 	}
 
 	public double calcularTotal(Categoria categoria, List<String> asientos) {
-		Validaciones.validarCategoria(categoria);
-		Validaciones.validarAsientosSeleccionados(asientos);
-		Validaciones.validarAsientosNoDuplicados(asientos);
+		Validador.validarCategoria(categoria);
+		Validador.validarAsientosSeleccionados(asientos);
+		Validador.validarAsientosNoDuplicados(asientos);
 		return gestorPrecios.obtenerPrecio(categoria) * asientos.size();
 	}
 
 	public ReporteVenta confirmarCompra(Categoria categoria, List<String> asientos, String carpetaReportes) {
-		Validaciones.validarCategoria(categoria);
-		Validaciones.validarAsientosSeleccionados(asientos);
-		Validaciones.validarAsientosNoDuplicados(asientos);
+		Validador.validarCategoria(categoria);
+		Validador.validarAsientosSeleccionados(asientos);
+		Validador.validarAsientosNoDuplicados(asientos);
 
 		List<String> asientosVendidos = new ArrayList<>();
 		double total = 0;
