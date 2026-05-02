@@ -4,7 +4,6 @@
  */
 package Estructura;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,44 +13,68 @@ import modelo.Categoria;
 
 public class GestorBoletos {
 
-	private final Map<Categoria, LinkedList<Boleto>> boletosPorCategoria = new EnumMap<>(Categoria.class);
-	private int contadorBoletos = 1;
+    // Listas dinámicas requeridas: Disponibles y Vendidos
+    private final Map<Categoria, LinkedList<Boleto>> disponiblesPorCategoria = new EnumMap<>(Categoria.class);
+    private final Map<Categoria, LinkedList<Boleto>> vendidosPorCategoria = new EnumMap<>(Categoria.class);
+    private int contadorBoletos = 1;
 
-	public GestorBoletos() {
-		for (Categoria categoria : Categoria.values()) {
-			boletosPorCategoria.put(categoria, new LinkedList<>());
-		}
-	}
+    public GestorBoletos() {
+        for (Categoria categoria : Categoria.values()) {
+            disponiblesPorCategoria.put(categoria, new LinkedList<>());
+            vendidosPorCategoria.put(categoria, new LinkedList<>());
+        }
+    }
 
-	public void inicializarBoletos(Categoria categoria, List<String> asientos, double precio) {
-		LinkedList<Boleto> lista = boletosPorCategoria.get(categoria);
-		lista.clear();
+    public void inicializarBoletos(Categoria categoria, List<String> asientos, double precio) {
+        LinkedList<Boleto> listaDisp = disponiblesPorCategoria.get(categoria);
+        listaDisp.clear();
+        vendidosPorCategoria.get(categoria).clear();
 
-		for (String asiento : asientos) {
-			lista.add(new Boleto(contadorBoletos++, categoria, precio, asiento));
-		}
-	}
+        for (String asiento : asientos) {
+            listaDisp.add(new Boleto(contadorBoletos++, categoria, precio, asiento));
+        }
+    }
 
-	public Boleto buscarBoletoPorAsiento(Categoria categoria, String asiento) {
-		for (Boleto boleto : boletosPorCategoria.get(categoria)) {
-			if (boleto.getAsiento().equalsIgnoreCase(asiento)) {
-				return boleto;
-			}
-		}
-		return null;
-	}
+    /**
+     * Implementación de la Gestión Dinámica: 
+     * Elimina el boleto de la lista de disponibles y lo mueve a vendidos.
+     */
+    public void registrarVentaDinamica(Categoria categoria, String etiquetaAsiento) {
+        LinkedList<Boleto> disponibles = disponiblesPorCategoria.get(categoria);
+        Boleto boletoEncontrado = null;
 
-	public List<Boleto> listarDisponibles(Categoria categoria) {
-		List<Boleto> disponibles = new ArrayList<>();
-		for (Boleto boleto : boletosPorCategoria.get(categoria)) {
-			if (!boleto.isVendido()) {
-				disponibles.add(boleto);
-			}
-		}
-		return disponibles;
-	}
+        // Operación de Búsqueda y Eliminación en LinkedList
+        for (Boleto b : disponibles) {
+            if (b.getAsiento().equalsIgnoreCase(etiquetaAsiento)) {
+                boletoEncontrado = b;
+                break;
+            }
+        }
 
-	public List<Boleto> listarTodos(Categoria categoria) {
-		return List.copyOf(boletosPorCategoria.get(categoria));
-	}
+        if (boletoEncontrado != null) {
+            disponibles.remove(boletoEncontrado); // ELIMINAR de la lista (Requisito Maestra)
+            boletoEncontrado.vender();
+            vendidosPorCategoria.get(categoria).add(boletoEncontrado); // MOVER a otra lista
+        } else {
+            throw new IllegalStateException("El boleto para el asiento " + etiquetaAsiento + " no está en la lista de disponibles.");
+        }
+    }
+
+    public Boleto buscarBoletoDisponible(Categoria categoria, String asiento) {
+        for (Boleto boleto : disponiblesPorCategoria.get(categoria)) {
+            if (boleto.getAsiento().equalsIgnoreCase(asiento)) {
+                return boleto;
+            }
+        }
+        return null;
+    }
+
+    public List<Boleto> listarDisponibles(Categoria categoria) {
+        // Retornamos una copia de la lista de disponibles
+        return new LinkedList<>(disponiblesPorCategoria.get(categoria));
+    }
+
+    public List<Boleto> listarVendidos(Categoria categoria) {
+        return new LinkedList<>(vendidosPorCategoria.get(categoria));
+    }
 }
