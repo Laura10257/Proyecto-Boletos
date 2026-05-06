@@ -1,0 +1,7 @@
+--------------------------------------------------
+Fecha y hora: 03/05/2026 16:17:20
+Categoria: VIP
+Boletos vendidos: 2
+Ingreso total: $3000.00
+Detalles: Asientos: A2, B2
+
