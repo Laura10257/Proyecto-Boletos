@@ -117,3 +117,17 @@ Boletos vendidos: 2
 Ingreso total: $3200.00
 Detalles: Asientos: B4, B3
 
+--------------------------------------------------
+Fecha y hora: 02/05/2026 13:32:41
+Categoria: VIP
+Boletos vendidos: 3
+Ingreso total: $4500.00
+Detalles: Asientos: A2, A1, A3
+
+--------------------------------------------------
+Fecha y hora: 02/05/2026 13:35:34
+Categoria: VIP
+Boletos vendidos: 2
+Ingreso total: $3000.00
+Detalles: Asientos: A3, B3
+

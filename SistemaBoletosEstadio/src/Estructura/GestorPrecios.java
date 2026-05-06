@@ -4,42 +4,36 @@
  */
 package Estructura;
 
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 import modelo.Categoria;
 
 public class GestorPrecios {
 
-	private final Map<Categoria, Double> precios = new EnumMap<>(Categoria.class);
+    private final Map<Categoria, Double> precios = new HashMap<>();
 
-	public GestorPrecios() {
-        // Precios iniciales configurados por defecto
-		precios.put(Categoria.VIP, 1500.0);
-		precios.put(Categoria.GENERAL, 800.0);
-		precios.put(Categoria.PREFERENCIAL, 1100.0);
-	}
+    public GestorPrecios() {
+        precios.put(Categoria.VIP,          1500.0);
+        precios.put(Categoria.GENERAL,       800.0);
+        precios.put(Categoria.PREFERENCIAL, 1100.0);
+    }
 
-	public double obtenerPrecio(Categoria categoria) {
-		Double precio = precios.get(categoria);
-		if (precio == null) {
-			throw new IllegalArgumentException("No hay precio configurado para: " + categoria);
-		}
-		return precio;
-	}
+    public double obtenerPrecio(Categoria categoria) {
+        Double precio = precios.get(categoria);
+        if (precio == null) {
+            throw new IllegalArgumentException("No hay precio configurado para: " + categoria);
+        }
+        return precio;
+    }
 
-    /**
-     * REQUISITO: Actualizar precio.
-     * Modifica el valor asociado a la clave correspondiente en el mapa.
-     */
-	public void actualizarPrecio(Categoria categoria, double nuevoPrecio) {
-		if (nuevoPrecio <= 0) {
-			throw new IllegalArgumentException("El precio debe ser mayor a 0.");
-		}
-        // Uso de put() para actualizar el valor en el HashMap (Punto solicitado)
-		precios.put(categoria, nuevoPrecio);
-	}
+    public void actualizarPrecio(Categoria categoria, double nuevoPrecio) {
+        if (nuevoPrecio <= 0) {
+            throw new IllegalArgumentException("El precio debe ser mayor a 0.");
+        }
+        precios.put(categoria, nuevoPrecio);
+    }
 
-	public Map<Categoria, Double> listarPrecios() {
-		return Map.copyOf(precios);
-	}
+    public Map<Categoria, Double> listarPrecios() {
+        return Map.copyOf(precios);
+    }
 }
