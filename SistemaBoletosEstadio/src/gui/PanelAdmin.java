@@ -10,7 +10,7 @@ import servicio.VentaServicio;
 
 public class PanelAdmin extends JDialog {
 
-    // Paleta
+    // ── Paleta de colores ─────────────────────────────────────────────────────
     private static final Color BG       = new Color(13,  17,  23);
     private static final Color SURFACE  = new Color(22,  27,  34);
     private static final Color CARD     = new Color(30,  38,  52);
@@ -22,6 +22,10 @@ public class PanelAdmin extends JDialog {
     private static final Color PRE_C    = new Color(126, 231, 135);
     private static final Color GREEN    = new Color( 35, 134,  54);
     private static final Color DANGER   = new Color(218,  54,  51);
+    // Nuevos colores para el panel admin mejorado
+    private static final Color ACCENT   = new Color( 60, 130, 210);
+    private static final Color ACCENT2  = new Color( 99, 179, 237);
+    private static final Color BADGE_BG = new Color( 30,  55, 110);
 
     private final VentaServicio servicio;
     private final DefaultListModel<String> listModel;
@@ -35,7 +39,7 @@ public class PanelAdmin extends JDialog {
         this.servicio  = servicio;
         this.listModel = new DefaultListModel<>();
 
-        setSize(560, 660);
+        setSize(560, 680);
         setResizable(false);
         setLocationRelativeTo(padre);
         getContentPane().setBackground(BG);
@@ -48,37 +52,121 @@ public class PanelAdmin extends JDialog {
         actualizarVista();
     }
 
-    // ── Header ────────────────────────────────────────────────────────────────
+    // ── Header mejorado ───────────────────────────────────────────────────────
     private JPanel buildHeader() {
         JPanel h = new JPanel(new BorderLayout()) {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setPaint(new GradientPaint(0, 0, new Color(18, 26, 80), getWidth(), 0, new Color(10, 14, 40)));
+                // Degradado más rico
+                g2.setPaint(new GradientPaint(0, 0, new Color(20, 32, 90), getWidth(), 0, new Color(10, 16, 50)));
                 g2.fillRect(0, 0, getWidth(), getHeight());
+                // Línea de acento inferior
+                g2.setPaint(new GradientPaint(0, 0, new Color(60, 130, 210, 180),
+                        getWidth(), 0, new Color(30, 80, 160, 60)));
+                g2.fillRect(0, getHeight() - 2, getWidth(), 2);
                 g2.dispose();
             }
         };
         h.setOpaque(false);
-        h.setPreferredSize(new Dimension(0, 60));
-        h.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(0, 0, 1, 0, BORDER),
-            new EmptyBorder(0, 20, 0, 20)
-        ));
+        h.setPreferredSize(new Dimension(0, 72));
+        h.setBorder(new EmptyBorder(0, 20, 0, 20));
 
-        JLabel titulo = new JLabel("PANEL DE ADMINISTRACION");
-        titulo.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        // Icono de escudo (panel pintado)
+        JPanel shieldIcon = new JPanel() {
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                int cx = getWidth() / 2, cy = getHeight() / 2;
+
+                // Halo
+                g2.setPaint(new RadialGradientPaint(cx, cy, 20,
+                        new float[]{0f, 1f},
+                        new Color[]{new Color(60, 130, 210, 55), new Color(0, 0, 0, 0)}));
+                g2.fillOval(cx - 20, cy - 20, 40, 40);
+
+                // Fondo circular
+                g2.setPaint(new GradientPaint(cx - 14, cy - 14,
+                        new Color(40, 85, 165), cx + 14, cy + 14, new Color(20, 50, 110)));
+                g2.fillOval(cx - 16, cy - 16, 32, 32);
+                g2.setColor(new Color(80, 150, 230, 140));
+                g2.setStroke(new BasicStroke(1.2f));
+                g2.drawOval(cx - 16, cy - 16, 32, 32);
+
+                // Escudo
+                int[] sx = {cx - 7, cx - 7, cx, cx + 7, cx + 7};
+                int[] sy = {cy - 8, cy,      cy + 10, cy, cy - 8};
+                g2.setColor(new Color(175, 215, 255));
+                g2.fillPolygon(sx, sy, 5);
+                // Rayita interna
+                g2.setColor(new Color(20, 50, 110));
+                g2.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawLine(cx - 3, cy + 1, cx, cy + 4);
+                g2.drawLine(cx, cy + 4, cx + 4, cy - 2);
+
+                g2.dispose();
+            }
+        };
+        shieldIcon.setOpaque(false);
+        shieldIcon.setPreferredSize(new Dimension(44, 72));
+
+        // Textos
+        JPanel textBlock = new JPanel();
+        textBlock.setOpaque(false);
+        textBlock.setLayout(new BoxLayout(textBlock, BoxLayout.Y_AXIS));
+        textBlock.setBorder(new EmptyBorder(0, 0, 0, 0));
+
+        JLabel titulo = new JLabel("Panel de Administración");
+        titulo.setFont(new Font("Segoe UI", Font.BOLD, 16));
         titulo.setForeground(Color.WHITE);
+        titulo.setAlignmentX(LEFT_ALIGNMENT);
 
-        JLabel sub = new JLabel("Gestion de precios y cierre de caja");
+        JLabel sub = new JLabel("Gestión de precios y cierre de caja");
         sub.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-        sub.setForeground(MUTED);
+        sub.setForeground(new Color(120, 160, 220));
+        sub.setAlignmentX(LEFT_ALIGNMENT);
 
-        JPanel left = new JPanel(new GridLayout(2, 1, 0, 2));
-        left.setOpaque(false);
-        left.add(titulo);
-        left.add(sub);
-        h.add(left, BorderLayout.CENTER);
+        textBlock.add(Box.createVerticalGlue());
+        textBlock.add(titulo);
+        textBlock.add(Box.createVerticalStrut(3));
+        textBlock.add(sub);
+        textBlock.add(Box.createVerticalGlue());
+
+        // Badge "ADMIN"
+        JPanel badge = new JPanel() {
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,      RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                // Fondo del badge
+                g2.setColor(BADGE_BG);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                g2.setColor(new Color(60, 130, 210, 180));
+                g2.setStroke(new BasicStroke(1f));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 10, 10);
+                // Texto
+                g2.setFont(new Font("Segoe UI", Font.BOLD, 9));
+                g2.setColor(ACCENT2);
+                FontMetrics fm = g2.getFontMetrics();
+                g2.drawString("ADMIN", getWidth() / 2 - fm.stringWidth("ADMIN") / 2,
+                        getHeight() / 2 + fm.getAscent() / 2 - 1);
+                g2.dispose();
+            }
+        };
+        badge.setOpaque(false);
+        badge.setPreferredSize(new Dimension(54, 22));
+
+        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 25));
+        right.setOpaque(false);
+        right.add(badge);
+
+        JPanel leftBlock = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        leftBlock.setOpaque(false);
+        leftBlock.add(shieldIcon);
+        leftBlock.add(textBlock);
+
+        h.add(leftBlock, BorderLayout.WEST);
+        h.add(right,     BorderLayout.EAST);
         return h;
     }
 
@@ -116,7 +204,7 @@ public class PanelAdmin extends JDialog {
         lblVentasCount.setFont(new Font("Segoe UI", Font.BOLD, 22));
         lblVentasCount.setForeground(new Color(88, 166, 255));
 
-        row.add(statCard("INGRESO ACUMULADO", lblIngresoTotal));
+        row.add(statCard("INGRESO ACUMULADO",     lblIngresoTotal));
         row.add(statCard("VENTAS EN COLA (FIFO)", lblVentasCount));
         return row;
     }
@@ -166,7 +254,7 @@ public class PanelAdmin extends JDialog {
         card.add(priceRow("GENERAL",      txtGen, GEN_C));
         card.add(Box.createVerticalStrut(12));
 
-        JButton btnGuardar = styledBtn("Guardar cambios en HashMap", GREEN, true);
+        JButton btnGuardar = buildStyledBtn("Guardar cambios en HashMap", GREEN, true);
         btnGuardar.setAlignmentX(LEFT_ALIGNMENT);
         btnGuardar.setMaximumSize(new Dimension(Integer.MAX_VALUE, 34));
         btnGuardar.addActionListener(e -> guardarPreciosEnHashMap());
@@ -225,7 +313,7 @@ public class PanelAdmin extends JDialog {
         scroll.setBorder(BorderFactory.createLineBorder(BORDER));
         scroll.setPreferredSize(new Dimension(0, 110));
 
-        JButton btnCierre = styledBtn("EJECUTAR CIERRE DE CAJA  —  Desencolar FIFO", DANGER, true);
+        JButton btnCierre = buildStyledBtn("EJECUTAR CIERRE DE CAJA  —  Desencolar FIFO", DANGER, true);
         btnCierre.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
         btnCierre.addActionListener(e -> ejecutarCierreCaja());
 
@@ -234,14 +322,24 @@ public class PanelAdmin extends JDialog {
         return card;
     }
 
-    // ── Footer ────────────────────────────────────────────────────────────────
+    // ── Footer mejorado ───────────────────────────────────────────────────────
     private JPanel buildFooter() {
-        JPanel f = new JPanel(new FlowLayout(FlowLayout.RIGHT, 16, 8));
-        f.setBackground(SURFACE);
+        JPanel f = new JPanel(new FlowLayout(FlowLayout.RIGHT, 16, 10)) {
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setColor(SURFACE);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                g2.setPaint(new GradientPaint(0, 0, new Color(60, 130, 210, 60),
+                        getWidth(), 0, new Color(0, 0, 0, 0)));
+                g2.fillRect(0, 0, getWidth(), 1);
+                g2.dispose();
+            }
+        };
+        f.setOpaque(false);
         f.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, BORDER));
 
-        JButton btnCerrar = styledBtn("Cerrar", BORDER, false);
-        btnCerrar.setPreferredSize(new Dimension(100, 30));
+        JButton btnCerrar = buildStyledBtn("Cerrar", BORDER, false);
+        btnCerrar.setPreferredSize(new Dimension(110, 32));
         btnCerrar.addActionListener(e -> dispose());
         f.add(btnCerrar);
         return f;
@@ -289,7 +387,10 @@ public class PanelAdmin extends JDialog {
         return f;
     }
 
-    private JButton styledBtn(String text, Color color, boolean filled) {
+    /**
+     * Botón con diseño consistente: degradado, hover, borde y texto centrado.
+     */
+    private JButton buildStyledBtn(String text, Color color, boolean filled) {
         JButton btn = new JButton(text) {
             boolean hovered = false;
             { addMouseListener(new MouseAdapter() {
@@ -302,8 +403,13 @@ public class PanelAdmin extends JDialog {
                 g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
                 Color c = hovered ? color.brighter() : color;
                 if (filled) {
-                    g2.setColor(c);
+                    g2.setPaint(new GradientPaint(0, 0, c, 0, getHeight(), c.darker()));
                     g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                    // Brillo superior
+                    g2.setPaint(new GradientPaint(0, 0,
+                            new Color(255, 255, 255, hovered ? 45 : 20),
+                            0, getHeight() / 2, new Color(255, 255, 255, 0)));
+                    g2.fillRoundRect(2, 2, getWidth() - 4, getHeight() / 2, 6, 6);
                 } else {
                     g2.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), hovered ? 50 : 20));
                     g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
@@ -314,7 +420,8 @@ public class PanelAdmin extends JDialog {
                 g2.setFont(new Font("Segoe UI", Font.BOLD, 11));
                 g2.setColor(Color.WHITE);
                 FontMetrics fm = g2.getFontMetrics();
-                g2.drawString(getText(), getWidth()/2 - fm.stringWidth(getText())/2,
+                g2.drawString(getText(),
+                    getWidth()/2 - fm.stringWidth(getText())/2,
                     getHeight()/2 + fm.getAscent()/2 - 2);
                 g2.dispose();
             }
@@ -355,7 +462,7 @@ public class PanelAdmin extends JDialog {
             return;
         }
 
-        double totalSesion   = 0;
+        double totalSesion    = 0;
         int    boletosTotales = 0;
         StringBuilder detalle = new StringBuilder("=== RESUMEN DE CIERRE ===\n\n");
 
@@ -375,3 +482,4 @@ public class PanelAdmin extends JDialog {
         actualizarVista();
     }
 }
+
