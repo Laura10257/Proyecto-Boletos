@@ -47,3 +47,17 @@ Boletos vendidos: 2
 Ingreso total: $1600.00
 Detalles: Asientos: C3, C4
 
+--------------------------------------------------
+Fecha y hora: 09/05/2026 23:51:38
+Categoria: GENERAL
+Boletos vendidos: 3
+Ingreso total: $2400.00
+Detalles: Asientos: A6, C8, B12
+
+--------------------------------------------------
+Fecha y hora: 09/05/2026 23:53:11
+Categoria: PREFERENCIAL
+Boletos vendidos: 3
+Ingreso total: $3300.00
+Detalles: Asientos: C4, B4, A4
+
