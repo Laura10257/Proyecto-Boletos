@@ -13,7 +13,7 @@ import modelo.Categoria;
 
 public class GestorBoletos {
 
-    // Listas dinámicas requeridas: Disponibles y Vendidos
+    // Listas dinámicas USADAS: Disponibles y Vendidos
     private final Map<Categoria, LinkedList<Boleto>> disponiblesPorCategoria = new EnumMap<>(Categoria.class);
     private final Map<Categoria, LinkedList<Boleto>> vendidosPorCategoria = new EnumMap<>(Categoria.class);
     private int contadorBoletos = 1;
@@ -50,7 +50,7 @@ public class GestorBoletos {
                 break;
             }
         }
-
+//BUSCA OBJETO RECORRIENDO LO NODOS Y UNA VEZ ENCONTRADO UTILIZA EL .REMOVE PARA DESCONECTAR EL NODO Y CONECTA EL NODO PASADO CON SIGUIENTE
         if (boletoEncontrado != null) {
             disponibles.remove(boletoEncontrado); // ELIMINAR de la lista (Requisito Maestra)
             boletoEncontrado.vender();
