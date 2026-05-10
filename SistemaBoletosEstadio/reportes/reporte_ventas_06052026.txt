@@ -1,0 +1,21 @@
+--------------------------------------------------
+Fecha y hora: 06/05/2026 10:06:02
+Categoria: VIP
+Boletos vendidos: 2
+Ingreso total: $3000.00
+Detalles: Asientos: C3, B4
+
+--------------------------------------------------
+Fecha y hora: 06/05/2026 10:55:02
+Categoria: PREFERENCIAL
+Boletos vendidos: 1
+Ingreso total: $1100.00
+Detalles: Asientos: B2
+
+--------------------------------------------------
+Fecha y hora: 06/05/2026 11:09:05
+Categoria: PREFERENCIAL
+Boletos vendidos: 2
+Ingreso total: $2200.00
+Detalles: Asientos: D3, C3
+

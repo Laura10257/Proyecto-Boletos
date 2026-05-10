@@ -32,7 +32,7 @@ public class VentaServicio {
 	private final GestorReportes gestorReportes;
 
 	public VentaServicio() {
-		// Inicialización de dimensiones del estadio (Filas, Columnas por categoría)[cite: 3]
+		// Inicialización de dimensiones del estadio (Filas, Columnas por categoría
 		this.mapaAsientos = new ControladorEstadio(3, 5, 6, 8, 4, 6);
 		this.gestorPrecios = new GestorPrecios();
 		this.gestorBoletos = new GestorBoletos();
@@ -45,7 +45,7 @@ public class VentaServicio {
 	}
 
 	/**
-	 * Crea los objetos Boleto y los almacena en la LinkedList correspondiente.
+	 * Se crearon los objetos Boletos y se almacenaron en la LinkedList correspondiente.
 	 */
 	private void inicializarBoletosCategoria(Categoria categoria) {
 		List<String> asientosDisponibles = mapaAsientos.listarAsientosDisponibles(categoria);
@@ -59,7 +59,7 @@ public class VentaServicio {
 	}
 
 	/**
-	 * Calcula el total consultando el precio actual en el HashMap.
+	 * Se calculo el total consultando el precio actual en el HashMap.
 	 */
 	public double calcularTotal(Categoria categoria, List<String> asientos) {
 		Validador.validarCategoria(categoria);
@@ -71,7 +71,7 @@ public class VentaServicio {
 	}
 
 	/**
-	 * Proceso de compra: Ejecuta la Gestión Dinámica en Listas y el registro en Cola FIFO[cite: 1, 2, 4].
+	 * Proceso de compra: Ejecuta la Gestión Dinámica en Listas y el registro en Cola FIFO
 	 */
 	public ReporteVenta confirmarCompra(Categoria categoria, List<String> asientos, String carpetaReportes) {
 		Validador.validarCategoria(categoria);
@@ -85,22 +85,22 @@ public class VentaServicio {
 		for (String asiento : asientos) {
 			String normalizado = asiento.trim().toUpperCase();
 			
-			// 1. Validar disponibilidad en la Matriz Visual[cite: 3]
+			// 1. Validar disponibilidad en la Matriz Visual
 			if (!mapaAsientos.estaDisponible(categoria, normalizado)) {
 				throw new IllegalStateException("El asiento " + normalizado + " ya está ocupado.");
 			}
 
-			// 2. GESTIÓN DINÁMICA: Eliminar de LinkedList de disponibles y mover a vendidos[cite: 1, 4]
+			// 2. GESTIÓN DINÁMICA: Eliminar de LinkedList de disponibles y mover a vendidos
 			gestorBoletos.registrarVentaDinamica(categoria, normalizado);
 			
-			// 3. Actualizar estado en la Matriz[cite: 3]
+			// 3. Actualizar estado en la Matriz
 			mapaAsientos.ocuparAsiento(categoria, normalizado);
 
 			asientosVendidos.add(normalizado);
 			total += precioAlMomento;
 		}
 
-		// Crear el reporte de la transacción[cite: 13]
+		// Crear el reporte de la transacción
 		ReporteVenta reporte = new ReporteVenta(
 				LocalDateTime.now(),
 				categoria,
@@ -109,14 +109,14 @@ public class VentaServicio {
 				"Asientos: " + String.join(", ", asientosVendidos)
 		);
 
-		// 4. REGISTRO EN COLA (FIFO): Almacenar para cierre de caja o persistencia[cite: 1, 2, 6]
+		// 4. REGISTRO EN COLA (FIFO): Almacenar para cierre de caja o persistencia
 		gestorReportes.registrarReporte(reporte, carpetaReportes);
 		
 		return reporte;
 	}
 
 	/**
-	 * REQUISITO: Actualizar precio en el HashMap[cite: 1, 5].
+	 * REQUISITO: Actualizar precio en el HashMap
 	 */
 	public void actualizarPrecioCategoria(Categoria categoria, double nuevoPrecio) {
 		gestorPrecios.actualizarPrecio(categoria, nuevoPrecio);
@@ -127,7 +127,7 @@ public class VentaServicio {
 	}
 
 	/**
-	 * Acceso a la cola para el Panel de Administración[cite: 2, 6].
+	 * Acceso a la cola para el Panel de Administración
 	 */
 	public ColaReportes getColaReportes() {
 		return gestorReportes.getColaReportes();
