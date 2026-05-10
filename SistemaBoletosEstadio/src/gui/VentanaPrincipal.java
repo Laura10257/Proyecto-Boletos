@@ -21,16 +21,17 @@ public class VentanaPrincipal extends JFrame {
     private static final Color GEN_COLOR  = new Color( 88, 166, 255);
     private static final Color PRE_COLOR  = new Color(126, 231, 135);
     private static final Color BG_CARD    = new Color( 30,  38,  52);
+    private static final Color ADMIN_COLOR = new Color(99, 179, 237);   // azul claro admin
 
     // Colores de consola por estructura
-    private static final Color LOG_HASHMAP  = new Color(255, 215,   0);  // dorado
-    private static final Color LOG_LISTA    = new Color( 86, 217, 249);  // cyan
-    private static final Color LOG_MATRIZ   = new Color(192, 132, 252);  // violeta
-    private static final Color LOG_COLA     = new Color(253, 186, 116);  // naranja
-    private static final Color LOG_ARCHIVO  = new Color(134, 239, 172);  // verde claro
-    private static final Color LOG_INFO     = new Color(148, 163, 184);  // gris
-    private static final Color LOG_OK       = new Color( 74, 222, 128);  // verde
-    private static final Color LOG_ERROR    = new Color(248, 113, 113);  // rojo
+    private static final Color LOG_HASHMAP  = new Color(255, 215,   0);
+    private static final Color LOG_LISTA    = new Color( 86, 217, 249);
+    private static final Color LOG_MATRIZ   = new Color(192, 132, 252);
+    private static final Color LOG_COLA     = new Color(253, 186, 116);
+    private static final Color LOG_ARCHIVO  = new Color(134, 239, 172);
+    private static final Color LOG_INFO     = new Color(148, 163, 184);
+    private static final Color LOG_OK       = new Color( 74, 222, 128);
+    private static final Color LOG_ERROR    = new Color(248, 113, 113);
 
     private final VentaServicio ventaServicio;
     private final PanelAsientos panelAsientos;
@@ -116,19 +117,106 @@ public class VentanaPrincipal extends JFrame {
         titles.add(title); titles.add(sub);
         left.add(titles);
 
-        JButton btnAdmin = new JButton("Admin") {
-            { setContentAreaFilled(false); setBorderPainted(false);
-              setForeground(MUTED); setFont(new Font("Segoe UI", Font.PLAIN, 11));
-              setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); }
-        };
+        // ── Botón Admin mejorado ──────────────────────────────────────────────
+        JButton btnAdmin = buildAdminButton();
         btnAdmin.addActionListener(e -> abrirPanelAdministracion());
-        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 22));
+
+        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 16));
         right.setOpaque(false);
         right.add(btnAdmin);
 
         header.add(left,  BorderLayout.WEST);
         header.add(right, BorderLayout.EAST);
         return header;
+    }
+
+    /**
+     * Botón de administrador con diseño mejorado: icono de escudo, degradado,
+     * borde iluminado y efecto hover/press.
+     */
+    private JButton buildAdminButton() {
+        JButton btn = new JButton("Admin") {
+            private boolean hovered = false;
+            private boolean pressed = false;
+
+            {
+                addMouseListener(new MouseAdapter() {
+                    @Override public void mouseEntered(MouseEvent e) { hovered = true;  repaint(); }
+                    @Override public void mouseExited(MouseEvent e)  { hovered = false; pressed = false; repaint(); }
+                    @Override public void mousePressed(MouseEvent e) { pressed = true;  repaint(); }
+                    @Override public void mouseReleased(MouseEvent e){ pressed = false; repaint(); }
+                });
+            }
+
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,      RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+                int w = getWidth(), h = getHeight();
+
+                // Fondo degradado
+                Color c1, c2;
+                if (pressed) {
+                    c1 = new Color(30, 70, 120);
+                    c2 = new Color(20, 50, 95);
+                } else if (hovered) {
+                    c1 = new Color(50, 110, 180);
+                    c2 = new Color(30, 80, 145);
+                } else {
+                    c1 = new Color(35, 85, 150);
+                    c2 = new Color(20, 58, 110);
+                }
+                g2.setPaint(new GradientPaint(0, 0, c1, 0, h, c2));
+                g2.fillRoundRect(0, 0, w, h, 10, 10);
+
+                // Borde luminoso
+                Color borderColor = hovered
+                        ? new Color(99, 179, 237, 200)
+                        : new Color(60, 130, 200, 120);
+                g2.setColor(borderColor);
+                g2.setStroke(new BasicStroke(1.4f));
+                g2.drawRoundRect(0, 0, w - 1, h - 1, 10, 10);
+
+                // Brillo superior (efecto cristal)
+                g2.setPaint(new GradientPaint(0, 0,
+                        new Color(255, 255, 255, hovered ? 40 : 20),
+                        0, h / 2,
+                        new Color(255, 255, 255, 0)));
+                g2.fillRoundRect(2, 2, w - 4, h / 2 - 2, 8, 8);
+
+                // Icono de escudo (dibujo vectorial simple)
+                int iconX = 10, iconY = (h - 14) / 2;
+                Color iconColor = hovered ? new Color(180, 220, 255) : new Color(140, 195, 240);
+                g2.setColor(iconColor);
+                // Cuerpo del escudo
+                int[] shieldX = { iconX + 4, iconX, iconX, iconX + 4, iconX + 8, iconX + 8 };
+                int[] shieldY = { iconY, iconY + 2, iconY + 7, iconY + 12, iconY + 7, iconY + 2 };
+                g2.fillPolygon(shieldX, shieldY, 6);
+                // Checkmark interior
+                g2.setColor(pressed ? new Color(20, 50, 95) : c2);
+                g2.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawLine(iconX + 2, iconY + 6, iconX + 4, iconY + 8);
+                g2.drawLine(iconX + 4, iconY + 8, iconX + 7, iconY + 4);
+
+                // Texto
+                g2.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                g2.setColor(Color.WHITE);
+                FontMetrics fm = g2.getFontMetrics();
+                int textX = iconX + 14;
+                int textY = h / 2 + fm.getAscent() / 2 - 1;
+                g2.drawString("Admin", textX, textY);
+
+                g2.dispose();
+            }
+        };
+        btn.setPreferredSize(new Dimension(105, 34));
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setToolTipText("Acceder al panel de administración");
+        return btn;
     }
 
     // ── Sidebar ───────────────────────────────────────────────────────────────
@@ -253,11 +341,9 @@ public class VentanaPrincipal extends JFrame {
                 for (int i = 0; i < entries.length; i++) {
                     LogEntry e = entries[i];
                     int y = startY + i * lineH + fm.getAscent();
-                    // Timestamp
                     g2.setColor(new Color(71, 85, 105));
                     g2.drawString(e.time + "  ", 12, y);
                     int tx = 12 + fm.stringWidth(e.time + "  ");
-                    // Mensaje con color
                     g2.setColor(e.color);
                     g2.drawString(e.message, tx, y);
                 }
@@ -272,7 +358,6 @@ public class VentanaPrincipal extends JFrame {
         wrapper.setBackground(new Color(8, 12, 18));
         wrapper.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, BORDER));
 
-        // Header de la consola
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(new Color(12, 16, 24));
         header.setBorder(new EmptyBorder(3, 12, 3, 12));
@@ -290,7 +375,6 @@ public class VentanaPrincipal extends JFrame {
         return wrapper;
     }
 
-    // Agrega una entrada a la consola
     private void log(String mensaje, Color color) {
         String time = new java.text.SimpleDateFormat("HH:mm:ss").format(new java.util.Date());
         if (logEntries.size() >= MAX_LOG) logEntries.pollFirst();
@@ -349,7 +433,6 @@ public class VentanaPrincipal extends JFrame {
         List<String> seleccionados = panelAsientos.getAsientosSeleccionados();
         Set<String>  actual        = new LinkedHashSet<>(seleccionados);
 
-        // Detectar asientos recién seleccionados
         for (String s : actual) {
             if (!prevSeleccion.contains(s)) {
                 int row = s.charAt(0) - 'A';
@@ -359,7 +442,6 @@ public class VentanaPrincipal extends JFrame {
             }
         }
 
-        // Detectar asientos deseleccionados
         for (String s : prevSeleccion) {
             if (!actual.contains(s)) {
                 log("[INFO   ] Asiento " + s + " deseleccionado por el usuario", LOG_INFO);
@@ -402,19 +484,282 @@ public class VentanaPrincipal extends JFrame {
         }
     }
 
+    // ── Dialog de contraseña personalizado ───────────────────────────────────
     private void abrirPanelAdministracion() {
-        String pass = JOptionPane.showInputDialog(this, "Contrasena Admin:", "Acceso", JOptionPane.QUESTION_MESSAGE);
-        if ("1234".equals(pass)) {
+        // Colores del diálogo
+        final Color DIALOG_BG       = new Color(15, 20, 30);
+        final Color DIALOG_SURFACE  = new Color(22, 30, 45);
+        final Color DIALOG_BORDER   = new Color(40, 60, 100);
+        final Color DIALOG_ACCENT   = new Color(60, 130, 210);
+        final Color DIALOG_ACCENT2  = new Color(99, 179, 237);
+        final Color DIALOG_TEXT     = new Color(210, 225, 245);
+        final Color DIALOG_MUTED    = new Color(100, 130, 170);
+
+        JDialog dialogo = new JDialog(this, "Acceso Administrativo", true);
+        dialogo.setUndecorated(true);
+        dialogo.setSize(360, 310);
+        dialogo.setLocationRelativeTo(this);
+
+        JPanel root = new JPanel(new BorderLayout()) {
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                // Fondo oscuro con leve degradado
+                g2.setPaint(new GradientPaint(0, 0, new Color(18, 26, 50), 0, getHeight(), DIALOG_BG));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 14, 14);
+                g2.dispose();
+            }
+        };
+        root.setOpaque(false);
+        root.setBorder(BorderFactory.createLineBorder(DIALOG_BORDER, 1));
+
+        // ── Zona superior con icono y título ──────────────────────────────────
+        JPanel top = new JPanel() {
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setPaint(new GradientPaint(0, 0, new Color(20, 35, 80), getWidth(), 0, new Color(12, 20, 55)));
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                g2.setColor(new Color(40, 65, 120));
+                g2.setStroke(new BasicStroke(1f));
+                g2.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1);
+                g2.dispose();
+            }
+        };
+        top.setOpaque(false);
+        top.setPreferredSize(new Dimension(0, 95));
+        top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
+
+        // Icono de candado (dibujado a mano con Graphics2D)
+        JPanel iconPanel = new JPanel() {
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                int cx = getWidth() / 2, cy = getHeight() / 2;
+
+                // Halo exterior
+                g2.setPaint(new RadialGradientPaint(cx, cy, 28,
+                    new float[]{0f, 1f},
+                    new Color[]{new Color(60, 130, 210, 60), new Color(0, 0, 0, 0)}));
+                g2.fillOval(cx - 28, cy - 28, 56, 56);
+
+                // Círculo de fondo del icono
+                g2.setPaint(new GradientPaint(cx - 20, cy - 20, new Color(35, 75, 145),
+                        cx + 20, cy + 20, new Color(20, 50, 100)));
+                g2.fillOval(cx - 20, cy - 20, 40, 40);
+                g2.setColor(new Color(80, 150, 230, 150));
+                g2.setStroke(new BasicStroke(1.5f));
+                g2.drawOval(cx - 20, cy - 20, 40, 40);
+
+                // Cuerpo del candado
+                g2.setColor(new Color(180, 215, 255));
+                g2.fillRoundRect(cx - 9, cy - 1, 18, 13, 4, 4);
+
+                // Arco del candado
+                g2.setColor(new Color(180, 215, 255));
+                g2.setStroke(new BasicStroke(2.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                g2.drawArc(cx - 7, cy - 10, 14, 14, 0, 180);
+
+                // Ojo del candado
+                g2.setColor(new Color(20, 50, 100));
+                g2.fillOval(cx - 2, cy + 3, 4, 4);
+
+                g2.dispose();
+            }
+        };
+        iconPanel.setOpaque(false);
+        iconPanel.setPreferredSize(new Dimension(360, 58));
+        iconPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 58));
+
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        titlePanel.setOpaque(false);
+        JLabel lblTitle = new JLabel("Acceso Administrativo");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblTitle.setForeground(DIALOG_TEXT);
+        JLabel lblSub = new JLabel("Ingresa la contraseña para continuar");
+        lblSub.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        lblSub.setForeground(DIALOG_MUTED);
+        JPanel titleBox = new JPanel();
+        titleBox.setOpaque(false);
+        titleBox.setLayout(new BoxLayout(titleBox, BoxLayout.Y_AXIS));
+        lblTitle.setAlignmentX(CENTER_ALIGNMENT);
+        lblSub.setAlignmentX(CENTER_ALIGNMENT);
+        titleBox.add(lblTitle);
+        titleBox.add(Box.createVerticalStrut(2));
+        titleBox.add(lblSub);
+        titlePanel.add(titleBox);
+
+        top.add(iconPanel);
+        top.add(titlePanel);
+
+        // ── Zona central: campo de contraseña ─────────────────────────────────
+        JPanel center = new JPanel();
+        center.setOpaque(false);
+        center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
+        center.setBorder(new EmptyBorder(20, 30, 10, 30));
+
+        JLabel lblField = new JLabel("Contraseña");
+        lblField.setFont(new Font("Segoe UI", Font.BOLD, 10));
+        lblField.setForeground(DIALOG_ACCENT2);
+        lblField.setAlignmentX(LEFT_ALIGNMENT);
+
+        JPasswordField passField = new JPasswordField() {
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(DIALOG_SURFACE);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                g2.setColor(DIALOG_BORDER);
+                g2.setStroke(new BasicStroke(1.3f));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        passField.setOpaque(false);
+        passField.setForeground(Color.WHITE);
+        passField.setCaretColor(DIALOG_ACCENT2);
+        passField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        passField.setBorder(new EmptyBorder(6, 12, 6, 12));
+        passField.setEchoChar('●');
+        passField.setAlignmentX(LEFT_ALIGNMENT);
+        passField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+
+        // Etiqueta de error (oculta inicialmente)
+        JLabel lblError = new JLabel("⚠  Contraseña incorrecta. Intente de nuevo.");
+        lblError.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        lblError.setForeground(new Color(248, 113, 113));
+        lblError.setAlignmentX(LEFT_ALIGNMENT);
+        lblError.setVisible(false);
+
+        center.add(lblField);
+        center.add(Box.createVerticalStrut(6));
+        center.add(passField);
+        center.add(Box.createVerticalStrut(8));
+        center.add(lblError);
+
+        // ── Zona inferior: botones ────────────────────────────────────────────
+        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 12));
+        bottom.setOpaque(false);
+        bottom.setBorder(new EmptyBorder(0, 0, 6, 0));
+
+        JButton btnCancelar = buildDialogBtn("Cancelar", false, DIALOG_BORDER, DIALOG_TEXT);
+        JButton btnAceptar  = buildDialogBtn("Ingresar",  true, DIALOG_ACCENT, Color.WHITE);
+        btnCancelar.setPreferredSize(new Dimension(120, 36));
+        btnAceptar.setPreferredSize(new Dimension(140, 36));
+
+        final boolean[] acceso = {false};
+
+        Runnable intentarAcceso = () -> {
+            String pass = new String(passField.getPassword());
+            if ("1234".equals(pass)) {
+                acceso[0] = true;
+                dialogo.dispose();
+            } else {
+                lblError.setVisible(true);
+                passField.setText("");
+                passField.requestFocus();
+                // Animación de shake
+                final int[] count = {0};
+                final int origX = dialogo.getX();
+                javax.swing.Timer shake = new javax.swing.Timer(30, null);
+                shake.addActionListener(ev -> {
+                    count[0]++;
+                    int offset = (count[0] % 2 == 0) ? 6 : -6;
+                    dialogo.setLocation(origX + offset, dialogo.getY());
+                    if (count[0] >= 8) {
+                        shake.stop();
+                        dialogo.setLocation(origX, dialogo.getY());
+                    }
+                });
+                shake.start();
+            }
+        };
+
+        btnAceptar.addActionListener(e -> intentarAcceso.run());
+        btnCancelar.addActionListener(e -> dialogo.dispose());
+        passField.addActionListener(e -> intentarAcceso.run());
+
+        bottom.add(btnCancelar);
+        bottom.add(btnAceptar);
+
+        root.add(top,    BorderLayout.NORTH);
+        root.add(center, BorderLayout.CENTER);
+        root.add(bottom, BorderLayout.SOUTH);
+
+        // Panel de contenido transparente para bordes redondeados
+        JPanel glass = new JPanel(new BorderLayout()) {
+            @Override protected void paintComponent(Graphics g) {}
+        };
+        glass.setOpaque(false);
+        glass.add(root);
+        dialogo.setContentPane(glass);
+        dialogo.getRootPane().setDefaultButton(btnAceptar);
+        SwingUtilities.invokeLater(passField::requestFocus);
+
+        dialogo.setVisible(true);
+
+        // --- Post-diálogo ---
+        if (acceso[0]) {
             log("[INFO   ] Acceso al panel de administracion concedido", LOG_OK);
             PanelAdmin admin = new PanelAdmin(this, ventaServicio);
             admin.setVisible(true);
             actualizarEtiquetasPrecios();
             log("[HASHMAP] Precios actualizados desde panel admin", LOG_HASHMAP);
             actualizarResumen();
-        } else if (pass != null) {
-            log("[ERROR  ] Contrasena incorrecta en intento de acceso admin", LOG_ERROR);
-            JOptionPane.showMessageDialog(this, "Contrasena incorrecta.", "Error de Acceso", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    /**
+     * Botón reutilizable para el diálogo de contraseña.
+     */
+    private JButton buildDialogBtn(String text, boolean filled, Color color, Color textColor) {
+        JButton btn = new JButton(text) {
+            private boolean hovered = false;
+            {
+                addMouseListener(new MouseAdapter() {
+                    @Override public void mouseEntered(MouseEvent e) { hovered = true;  repaint(); }
+                    @Override public void mouseExited(MouseEvent e)  { hovered = false; repaint(); }
+                });
+            }
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,      RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+                Color base = hovered ? color.brighter() : color;
+                if (filled) {
+                    g2.setPaint(new GradientPaint(0, 0, base, 0, getHeight(),
+                            base.darker()));
+                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                    // Brillo superior
+                    g2.setPaint(new GradientPaint(0, 0,
+                            new Color(255, 255, 255, hovered ? 50 : 25),
+                            0, getHeight() / 2,
+                            new Color(255, 255, 255, 0)));
+                    g2.fillRoundRect(2, 2, getWidth() - 4, getHeight() / 2, 6, 6);
+                } else {
+                    g2.setColor(hovered
+                            ? new Color(base.getRed(), base.getGreen(), base.getBlue(), 40)
+                            : new Color(base.getRed(), base.getGreen(), base.getBlue(), 15));
+                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                    g2.setColor(base.brighter());
+                    g2.setStroke(new BasicStroke(1.2f));
+                    g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
+                }
+                g2.setFont(new Font("Segoe UI", Font.BOLD, 11));
+                g2.setColor(textColor);
+                FontMetrics fm = g2.getFontMetrics();
+                g2.drawString(getText(),
+                        getWidth() / 2 - fm.stringWidth(getText()) / 2,
+                        getHeight() / 2 + fm.getAscent() / 2 - 1);
+                g2.dispose();
+            }
+        };
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        return btn;
     }
 
     private void actualizarEtiquetasPrecios() {
@@ -493,3 +838,4 @@ public class VentanaPrincipal extends JFrame {
         LogEntry(String t, String m, Color c) { time = t; message = m; color = c; }
     }
 }
+

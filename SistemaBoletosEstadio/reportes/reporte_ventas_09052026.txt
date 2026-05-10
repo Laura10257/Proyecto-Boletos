@@ -1,0 +1,49 @@
+--------------------------------------------------
+Fecha y hora: 09/05/2026 20:52:33
+Categoria: VIP
+Boletos vendidos: 2
+Ingreso total: $3000.00
+Detalles: Asientos: C13, A17
+
+--------------------------------------------------
+Fecha y hora: 09/05/2026 20:52:42
+Categoria: GENERAL
+Boletos vendidos: 2
+Ingreso total: $1600.00
+Detalles: Asientos: C5, C8
+
+--------------------------------------------------
+Fecha y hora: 09/05/2026 20:52:49
+Categoria: PREFERENCIAL
+Boletos vendidos: 2
+Ingreso total: $2200.00
+Detalles: Asientos: A4, C3
+
+--------------------------------------------------
+Fecha y hora: 09/05/2026 21:57:16
+Categoria: GENERAL
+Boletos vendidos: 3
+Ingreso total: $2400.00
+Detalles: Asientos: C5, D9, C12
+
+--------------------------------------------------
+Fecha y hora: 09/05/2026 23:02:24
+Categoria: VIP
+Boletos vendidos: 2
+Ingreso total: $3000.00
+Detalles: Asientos: B8, B9
+
+--------------------------------------------------
+Fecha y hora: 09/05/2026 23:22:17
+Categoria: VIP
+Boletos vendidos: 2
+Ingreso total: $3000.00
+Detalles: Asientos: B5, B7
+
+--------------------------------------------------
+Fecha y hora: 09/05/2026 23:22:22
+Categoria: GENERAL
+Boletos vendidos: 2
+Ingreso total: $1600.00
+Detalles: Asientos: C3, C4
+

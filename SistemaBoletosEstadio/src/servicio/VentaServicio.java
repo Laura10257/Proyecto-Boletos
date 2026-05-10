@@ -135,4 +135,8 @@ public class VentaServicio {
 	public ColaReportes getColaReportes() {
 		return gestorReportes.getColaReportes();
 	}
+
+    public double obtenerPrecio(Categoria c) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

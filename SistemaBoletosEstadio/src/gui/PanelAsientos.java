@@ -365,4 +365,8 @@ public class PanelAsientos extends JPanel {
 
     private static int rows(Categoria cat) { return switch (cat) { case VIP -> VIP_ROWS; case GENERAL -> GEN_ROWS; case PREFERENCIAL -> PRE_ROWS; }; }
     private static int cols(Categoria cat) { return switch (cat) { case VIP -> VIP_COLS; case GENERAL -> GEN_COLS; case PREFERENCIAL -> PRE_HALF * 2; }; }
+
+    void setCategoriaActual(Categoria cat) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }
