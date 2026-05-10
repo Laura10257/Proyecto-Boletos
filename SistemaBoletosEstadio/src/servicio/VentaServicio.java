@@ -32,8 +32,11 @@ public class VentaServicio {
 	private final GestorReportes gestorReportes;
 
 	public VentaServicio() {
-		// Inicialización de dimensiones del estadio (Filas, Columnas por categoría
-		this.mapaAsientos = new ControladorEstadio(3, 5, 6, 8, 4, 6);
+
+		// Inicialización de dimensiones del estadio (Filas, Columnas por categoría)[cite: 3]
+		// VIP: 3 filas × 20 cols | GENERAL: 5 filas × 20 cols | PREF: 5 filas × 6 cols
+		this.mapaAsientos = new ControladorEstadio(3, 20, 5, 20, 5, 6);
+
 		this.gestorPrecios = new GestorPrecios();
 		this.gestorBoletos = new GestorBoletos();
 		this.gestorReportes = new GestorReportes();
